@@ -29,6 +29,30 @@ export const createValidationSchema = {
       errorMessage: "city must be string",
     },
   },
+  username: {
+    notEmpty: {
+      errorMessage: "username is required",
+    },
+    isLength: {
+      options: {
+        min: 2,
+        max: 15,
+      },
+      errorMessage: "username must be between 2-15 characters",
+    },
+  },
+  password: {
+    notEmpty: {
+      errorMessage: "password is required",
+    },
+    isLength: {
+      options: {
+        min: 2,
+        max: 15,
+      },
+      errorMessage: "password must be between 2-15 characters",
+    },
+  },
 };
 
 export const validationSchema = {
@@ -56,6 +80,33 @@ export const validationSchema = {
     },
     isString: {
       errorMessage: "must be string",
+    },
+  },
+};
+
+export const validateUserLogin = {
+  username: {
+    notEmpty: {
+      errorMessage: "username is required",
+    },
+    isLength: {
+      options: {
+        min: 2,
+        max: 15,
+      },
+      errorMessage: "username must be between 2-15 characters",
+    },
+  },
+  password: {
+    notEmpty: {
+      errorMessage: "password is required",
+    },
+    isLength: {
+      options: {
+        min: 2,
+        max: 15,
+      },
+      errorMessage: "password must be between 2-15 characters",
     },
   },
 };

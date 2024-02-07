@@ -5,19 +5,18 @@ import {
   createValidationSchema,
   validationSchema,
 } from "../utils/validationSchems.mjs";
-
+import { User } from "../mongoose/schemas/user.mjs";
 import {
   loggingMiddleware,
   resolveIndexByUserId,
 } from "../utils/middlewares.mjs";
+import { hashPassword } from "../utils/helpers.mjs";
 
 const router = Router();
 
-router.get("/", loggingMiddleware, (req, res) => {
-  res.send({ msg: "Hello, Suyog" });
-});
-
 router.get("/api/users", checkSchema(validationSchema), (req, res) => {
+  console.log(req.session);
+  console.log(req.session.id);
   const result = validationResult(req);
   if (!result.isEmpty()) return res.status(400).send({ error: result.array() });
   const data = matchedData(req);
@@ -34,15 +33,35 @@ router.get("/api/users", checkSchema(validationSchema), (req, res) => {
   return res.send(mockUsers);
 });
 
-router.post("/api/users", checkSchema(createValidationSchema), (req, res) => {
-  const result = validationResult(req);
-  if (!result.isEmpty()) return res.status(400).send({ error: result.array() });
-  const data = matchedData(req);
-  console.log("data", data);
-  const newUser = { id: mockUsers[mockUsers.length - 1].id + 1, ...data };
-  mockUsers.push(newUser);
-  res.status(200).send(mockUsers);
-});
+router.post(
+  "/api/users",
+  checkSchema(createValidationSchema),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty())
+      return res.status(400).send({ error: result.array() });
+    const data = matchedData(req);
+    data.password = hashPassword(data.password);
+    const newUser = new User(data);
+    try {
+      const saveUser = await newUser.save();
+      return res.status(201).send(saveUser);
+    } catch (err) {
+      console.log(err);
+      return res.sendStatus(400);
+    }
+  }
+);
+
+// router.post("/api/users", checkSchema(createValidationSchema), (req, res) => {
+//   const result = validationResult(req);
+//   if (!result.isEmpty()) return res.status(400).send({ error: result.array() });
+//   const data = matchedData(req);
+//   console.log("data", data);
+//   const newUser = { id: mockUsers[mockUsers.length - 1].id + 1, ...data };
+//   mockUsers.push(newUser);
+//   res.status(200).send(mockUsers);
+// });
 
 router.put(
   "/api/users/:id",
